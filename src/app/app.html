@@ -1,64 +1,124 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
-  <a class="navbar-brand fw-bold" href="#">bigBasket</a>
+  <span class="navbar-brand fw-bold" [routerLink]="'/'">bigBasket</span>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
     <span class="navbar-toggler-icon"></span>
   </button>
+
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav me-auto">
-      <li class="nav-item">
-        <a class="nav-link active" href="#">Dashboard</a>
+      <li class="nav-item" *ngIf="loggedUserData.custId != 0">
+        <button class="nav-link btn btn-link text-white"  [routerLink]="'/my-order'" >My Orders</button>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Team</a>
+      <li class="nav-item" *ngIf="loggedUserData.custId != 0">
+        <button class="nav-link btn btn-link text-white"  [routerLink]="'/update-profile'" >Update Profile</button>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Projects</a>
-      </li>
+
     </ul>
+
     <ul class="navbar-nav ms-auto align-items-center">
-      <li class="nav-item me-3">
-        <a class="nav-link" href="#">
+      <!-- Shopping Cart -->
+      <li class="nav-item me-3" *ngIf="loggedUserData.custId != 0">
+        <button class="btn btn-link text-white p-0" (click)="toggleCart()">
           <i class="fas fa-shopping-cart fs-5"></i>
-        </a>
+        </button>
       </li>
-      <li class="nav-item me-2">
-        <a class="btn btn-outline-light" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+
+      <!-- Login Button -->
+      <li class="nav-item me-2" *ngIf="loggedUserData.custId == 0">
+        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#loginModal">
+          Login
+        </button>
       </li>
-      <li class="nav-item">
-        <a class="btn btn-light text-primary" href="#" data-bs-toggle="modal"
-          data-bs-target="#registerModal">Register</a>
+
+      <!-- Register Button -->
+      <li class="nav-item" *ngIf="loggedUserData.custId == 0">
+        <button class="btn btn-light text-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+          Register
+        </button>
+      </li>
+
+      <!-- User Dropdown -->
+      <li class="nav-item dropdown" *ngIf="loggedUserData.custId != 0">
+        <button class="nav-link dropdown-toggle text-light btn btn-link" id="userDropdown" role="button"
+          data-bs-toggle="dropdown">
+          {{ loggedUserData.name }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li>
+            <button class="dropdown-item" (click)="logout()">Logout</button>
+          </li>
+        </ul>
       </li>
     </ul>
   </div>
 </nav>
 
-
-<!-- Products take full page -->
+<!-- Products full page -->
 <div class="my-4">
   <router-outlet></router-outlet>
 </div>
 
-<!-- Cart Card (fixed on right side) -->
+<!-- Cart Sidebar -->
+<div class="card shadow" *ngIf="showCart" style="width: 22rem; position: fixed; top: 80px; right: 20px; z-index: 1050;">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <span class="fw-bold">Cart Items</span>
+    <i class="fas fa-times" style="cursor: pointer;" (click)="toggleCart()"></i>
+  </div>
 
+  <div class="card-body">
+    <!-- Dynamic Cart Items -->
+    <div class="d-flex align-items-center mb-3" *ngFor="let item of cartData; let i = index">
+      <img [src]="item.productImageUrl" alt="{{ item.productName }}" class="me-3"
+        style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;" />
+      <div class="flex-grow-1">
+        <h6 class="mb-0">{{ item.productName }}</h6>
+        <small class="text-muted">${{ item.productPrice }}</small>
+        <br />
+        <small>Qty: {{ item.quantity }}</small>
+      </div>
+      <i class="fas fa-trash text-danger ms-3" style="cursor: pointer;" (click)="removeFromCart(item.cartId)"></i>
+    </div>
+
+    <hr />
+
+    <!-- Quantity -->
+    <div class="d-flex justify-content-between">
+      <span class="fw-bold">Quantity</span>
+      <span>{{ getTotalQuantity() }}</span>
+    </div>
+
+    <!-- Total Price -->
+    <div class="d-flex justify-content-between mt-2 mb-3">
+      <span class="fw-bold">Total Price</span>
+      <span>${{ getTotalPrice() }}</span>
+    </div>
+
+    <!-- Checkout Button -->
+    <button class="btn btn-success w-100" [routerLink]="'/create-order'">
+      <i class="fas fa-shopping-cart me-2"></i> Checkout
+    </button>
+  </div>
+</div>
 
 <!-- Login Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="loginModalLabel">Login</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form (ngSubmit)="onLogin()">
           <div class="mb-3">
-            <label for="loginEmail" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="loginEmail" placeholder="Enter email">
+            <label>Mobile No</label>
+            <input type="text" [(ngModel)]="loginObj.userName" name="mobile" class="form-control" required />
           </div>
+
           <div class="mb-3">
-            <label for="loginPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="loginPassword" placeholder="Password">
+            <label>Password</label>
+            <input type="password" [(ngModel)]="loginObj.userPassword" name="password" class="form-control" required />
           </div>
           <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
@@ -68,36 +128,29 @@
 </div>
 
 <!-- Register Modal -->
-<div class="modal fade" id="registerModal" #registerModal tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="registerModalLabel" >Register</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Register</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form (ngSubmit)="onRegister()">
           <div class="mb-3">
-            <label for="registerName" class="form-label">Name</label>
-            <input type="text" class="form-control" id="registerName" placeholder="Enter full name"
-              [(ngModel)]="registerObj.Name" name="name">
+            <label>Name</label>
+            <input type="text" [(ngModel)]="registerObj.name" name="name" class="form-control" required />
           </div>
-
           <div class="mb-3">
-            <label for="registerMobile" class="form-label">Mobile No</label>
-            <input type="text" class="form-control" id="registerMobile" placeholder="Enter mobile number"
-              [(ngModel)]="registerObj.MobileNo" name="mobileNo">
+            <label>Mobile No</label>
+            <input type="text" [(ngModel)]="registerObj.mobileNo" name="mobileNo" class="form-control" required />
           </div>
-
           <div class="mb-3">
-            <label for="registerPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="registerPassword" placeholder="Password"
-              [(ngModel)]="registerObj.Password" name="password">
+            <label>Password</label>
+            <input type="password" [(ngModel)]="registerObj.password" name="password" class="form-control" required />
           </div>
-
-<button type="button" class="btn btn-primary w-100" (click)="onRegister()">Register</button>
+          <button type="submit" class="btn btn-success w-100">Register</button>
         </form>
-
       </div>
     </div>
   </div>

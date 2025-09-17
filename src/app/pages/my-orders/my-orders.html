@@ -1,1 +1,31 @@
-<p>my-orders works!</p>
+<div class="container my-4">
+  <h2 class="mb-4 fw-bold">My Orders</h2>
+
+  <!-- Orders Table -->
+  <div class="table-responsive" *ngIf="saleItemData | async as orders">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>#</th>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Delivery City</th>
+          <th>Total Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of saleItemData | async; let i = index ">
+          <td>{{ i + 1 }}</td>
+          <td>{{ order.saleId }}</td>
+          <td>{{ order.saleDate }}</td>
+          <td>{{order.deliveryCity}}</td>
+          <td>${{ order.totalInvoiceAmount }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary">View</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

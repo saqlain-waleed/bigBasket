@@ -1,1 +1,92 @@
-<p>create-order works!</p>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Billing Address (60%) -->
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white col-md-12">
+                    <h5 class="mb-0">Billing Address</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="container">
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">City</label>
+                                    <input type="text" class="form-control" name="deliveryCity"
+                                        [(ngModel)]="orderObj.deliveryCity" placeholder="Enter your city" />
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">Pincode</label>
+                                    <input type="text" class="form-control" name="deliveryPinCode"
+                                        [(ngModel)]="orderObj.deliveryPinCode" placeholder="Enter your Pincode" />
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">Address Line 1</label>
+                                    <textarea class="form-control" rows="3" name="deliveryAddress1"
+                                        [(ngModel)]="orderObj.deliveryAddress1" placeholder="Address Line 1">
+        </textarea>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">Address Line 2</label>
+                                    <textarea class="form-control" rows="3" name="deliveryAddress2"
+                                        [(ngModel)]="orderObj.deliveryAddress2" placeholder="Address Line 2">
+        </textarea>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">Landmark</label>
+                                    <input type="text" class="form-control" name="deliveryLandMark"
+                                        [(ngModel)]="orderObj.deliveryLandMark" placeholder="Landmark" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary (40%) -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">My Order</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Static Cart Items -->
+                    <div class="d-flex align-items-center mb-3" *ngFor="let item of cartData">
+                        <img [src]="item.productImageUrl" alt="Product 1" class="me-3"
+                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">{{item.productName}}</h6>
+                            <small class="text-muted">{{item.productPrice}}</small><br />
+                            <small>Qty:{{item.quantity}}</small>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Static Totals -->
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Total Quantity</span>
+                        <span>{{ getTotalQuantity() }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="fw-bold">Total Price</span>
+                        <span>{{getTotalPrice()}}</span>
+                    </div>
+
+                    <hr />
+
+                    <button class="btn btn-primary w-100" (click)="placeOrder()">
+                        Place Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

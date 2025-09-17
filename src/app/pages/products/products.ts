@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { Master } from '../../services/master';
-import { APIResponseModel, CategoryList, ProductList } from '../../model/Product';
+import { APIResponseModel, CartModel, CategoryList, Customer, ProductList } from '../../model/Product';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -20,7 +20,12 @@ export class Products implements OnInit {
   productList: WritableSignal<ProductList[]> = signal<ProductList[]>([]);
   categories: Observable<CategoryList[]> = new Observable<CategoryList[]>();
 
-  constructor(private masterService: Master) { }
+
+  constructor(private masterService: Master) {
+
+  }
+
+
 
   ngOnInit(): void {
     this.loadAllProducts();
@@ -38,6 +43,26 @@ export class Products implements OnInit {
       map(res => [{ categoryId: 0, categoryName: 'All', parentCategoryId: 0, userId: null }, ...res.data])
     );
   }
+
+
+
+  onAddToCart(id: number) {
+    const newObj: CartModel = new CartModel();
+    newObj.productId = id;
+    newObj.custId = this.masterService.loggedUserData.custId;
+    this.masterService.addToCart(newObj).subscribe((res: APIResponseModel) => {
+      if(res.result){
+        this.masterService.onCartAdded.next(true)
+      }else{
+        alert(res.message);
+      }
+
+
+    });
+
+  }
+
+
 
 
 
